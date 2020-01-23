@@ -44,6 +44,11 @@ float velocity_b = 0;
 float target_vel_a = 0.0;
 float target_vel_b = 0.0;
 
+// SENSORS //////////////////////////////////////////////
+int distance_ll = 0;
+int distance_rr = 0;
+
+
 // PID //////////////////////////////////////////////
 float motor_a = 0;
 float motor_b = 0;
@@ -79,7 +84,10 @@ unsigned long prev_time = 0;
 #define RPI_COMM_UPDATE_NULL 0
 #define RPI_COMM_UPDATE_ENCODER_RIGHT 1
 #define RPI_COMM_UPDATE_ENCODER_LEFT 2
+#define RPI_COMM_UPDATE_DISTANCE_RR 3
+#define RPI_COMM_UPDATE_DISTANCE_LL 4
 #define RPI_COMM_MESSAGE_ROBOT_INIT 114   // 'r' in 'robotics'
+
 
 String rpi_comm_string = "";
 bool rpi_comm_started = false;
@@ -303,6 +311,10 @@ void run_messaging(float dt) {
       Serial.write((byte*) &encoder_a, sizeof(encoder_a));
       Serial.write(RPI_COMM_UPDATE_ENCODER_LEFT);
       Serial.write((byte*) &encoder_b, sizeof(encoder_b));
+      Serial.write(RPI_COMM_UPDATE_DISTANCE_RR);
+      Serial.write((byte*) &encoder_a, sizeof(encoder_a));
+      Serial.write(RPI_COMM_UPDATE_DISTANCE_LL);
+      Serial.write((byte*) &encoder_a, sizeof(encoder_a));
     }
   }
 }
@@ -370,6 +382,12 @@ void publish_velocity() {
   }
 }
 
+void update_distance() {
+  distance_ll = analogRead(DEPTHSENSOR_A);
+  distance_rr = analogRead(DEPTHSENSOR_B);
+  
+} 
+
 void loop() {
   // TIMING
 
@@ -379,6 +397,7 @@ void loop() {
   run_messaging(dt);
   run_watchdog(dt);
   update_velocity(dt);
+  update_distance();
   run_velocity_pid(dt);
   publish_velocity();
 
