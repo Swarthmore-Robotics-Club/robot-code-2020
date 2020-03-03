@@ -28,8 +28,10 @@
 #define ENCODER_A1 2
 #define ENCODER_A2 4
 
-#define DEPTHSENSOR_A A2
+#define DEPTHSENSOR_A A3
 #define DEPTHSENSOR_B A0
+#define DEPTHSENSOR_C A7
+#define DEPTHSENSOR_D A5
 
 #define VELOCITY_WINDOW_WEIGHT (0.5)
 
@@ -47,7 +49,8 @@ float target_vel_b = 0.0;
 // SENSORS //////////////////////////////////////////////
 int distance_ll = 0;
 int distance_rr = 0;
-
+int distance_lc = 0;
+int distance_rc = 0;
 
 // PID //////////////////////////////////////////////
 float motor_a = 0;
@@ -86,6 +89,8 @@ unsigned long prev_time = 0;
 #define RPI_COMM_UPDATE_ENCODER_LEFT 2
 #define RPI_COMM_UPDATE_DISTANCE_RR 3
 #define RPI_COMM_UPDATE_DISTANCE_LL 4
+#define RPI_COMM_UPDATE_DISTANCE_RC 5
+#define RPI_COMM_UPDATE_DISTANCE_LC 6
 #define RPI_COMM_MESSAGE_ROBOT_INIT 114   // 'r' in 'robotics'
 
 
@@ -126,6 +131,8 @@ void setup() {
   pinMode(ENCODER_B2, INPUT);
   pinMode(DEPTHSENSOR_A, INPUT);
   pinMode(DEPTHSENSOR_B, INPUT);
+  pinMode(DEPTHSENSOR_C, INPUT);
+  pinMode(DEPTHSENSOR_D, INPUT);
 
   attachInterrupt(digitalPinToInterrupt(ENCODER_A1), encoder_a_tick, RISING);
   attachInterrupt(digitalPinToInterrupt(ENCODER_B1), encoder_b_tick, RISING);
@@ -312,9 +319,13 @@ void run_messaging(float dt) {
       Serial.write(RPI_COMM_UPDATE_ENCODER_LEFT);
       Serial.write((byte*) &encoder_b, sizeof(encoder_b));
       Serial.write(RPI_COMM_UPDATE_DISTANCE_RR);
-      Serial.write((byte*) &encoder_a, sizeof(encoder_a));
+      Serial.write((byte*) &distance_rr, sizeof(distance_rr));
       Serial.write(RPI_COMM_UPDATE_DISTANCE_LL);
-      Serial.write((byte*) &encoder_a, sizeof(encoder_a));
+      Serial.write((byte*) &distance_ll, sizeof(distance_ll));
+      Serial.write(RPI_COMM_UPDATE_DISTANCE_LC);
+      Serial.write((byte*) &distance_lc, sizeof(distance_lc));
+      Serial.write(RPI_COMM_UPDATE_DISTANCE_RC);
+      Serial.write((byte*) &distance_rc, sizeof(distance_rc));
     }
   }
 }
@@ -385,7 +396,8 @@ void publish_velocity() {
 void update_distance() {
   distance_ll = analogRead(DEPTHSENSOR_A);
   distance_rr = analogRead(DEPTHSENSOR_B);
-  
+  distance_lc = analogRead(DEPTHSENSOR_C);
+  distance_rc = analogRead(DEPTHSENSOR_D);
 } 
 
 void loop() {
