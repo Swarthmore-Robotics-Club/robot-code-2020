@@ -1,5 +1,4 @@
-#ifndef __ROBOT_INTERFACE_H__
-#define __ROBOT_INTERFACE_H__
+#include "robot_include.h"
 
 // state
 
@@ -124,6 +123,22 @@ float get_right_velocity() {
   return right_velocity;
 }
 
+float get_front_left_distance() {
+  return 3500 - analogRead(PIN_DISTANCE_SENSOR_FRONT_LEFT);
+}
+
+float get_front_right_distance() {
+  return 3500 - analogRead(PIN_DISTANCE_SENSOR_FRONT_RIGHT);
+}
+
+float get_rear_left_distance() {
+  return 3500 - analogRead(PIN_DISTANCE_SENSOR_REAR_LEFT);
+}
+
+float get_rear_right_distance() {
+  return 3500 - analogRead(PIN_DISTANCE_SENSOR_REAR_RIGHT);
+}
+
 void recompute_velocity(float dt) {
   float left_diff = ((float) (left_encoder - prev_left_encoder)) * DISTANCE_PER_TICK / dt;
   float right_diff = ((float) (right_encoder - prev_right_encoder)) * DISTANCE_PER_TICK / dt;
@@ -132,5 +147,3 @@ void recompute_velocity(float dt) {
   left_velocity = VELOCITY_WINDOW_WEIGHT * left_velocity + (1.0 - VELOCITY_WINDOW_WEIGHT) * left_diff;
   right_velocity = VELOCITY_WINDOW_WEIGHT * right_velocity + (1.0 - VELOCITY_WINDOW_WEIGHT) * right_diff;
 }
-
-#endif
