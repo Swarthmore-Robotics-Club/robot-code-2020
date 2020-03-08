@@ -43,14 +43,14 @@ class BluetoothTerminal
 
         bool available()
         {
-            return bluetooth_module.available()
+            return bluetooth_module->available();
         }
 
         String read()
         {
             // read from the bluetooth module, parse the headers, make sense of it
 
-            return bluetooth_module.read()
+            return String(bluetooth_module->read());
 
         }
 
@@ -63,9 +63,9 @@ class BluetoothTerminal
             // create message buffer and add header to it
             char message[200];
             memset(message, 0, 200);
-            byte message_len = data.length() + sizeof(struct message_header);
+            byte message_len = string.length() + sizeof(struct message_header);
             populate_header(message,message_len, message_cmd);
-            memcpy(message + sizeof(struct message_header), string, data.length()); 
+            memcpy(message + sizeof(struct message_header), string, string.length()); 
             // now write the message out over bluetooth
 
             bluetooth_module.write(message);
@@ -76,9 +76,8 @@ class BluetoothTerminal
 
         struct message_header
         {
-            byte msg_len,
-            byte message_cmd
-        }
+            byte msg_len, message_cmd;
+        };
         
     void populate_header(char * buff, byte msg_size, byte message_cmd)
     {
@@ -88,7 +87,7 @@ class BluetoothTerminal
     buff->msg_len = msg_size ;
     buff->message_cmd = message_cmd;
     }
-}
+};
 
 
  
@@ -99,13 +98,28 @@ void setup()
  
 }
 
+
+bool subscribed = false;
+
 void loop() 
 { 
  if (MyBlue.available()) 
     input = MyBlue.read(); 
  if (input == 'h' ) 
  { 
-   MyBleu.write("hello world!");
+   MyBlue.write("hello world!");
  } 
+  if (input =='s')
+  {
+    subscribed = true;
+  }
+  else if(input =='u')
+  {
+    subscribed = false;
+  }
+ if(subscribed)
+ {
+  MyBlue.write("hello sub!");
+ }
 
 }  
