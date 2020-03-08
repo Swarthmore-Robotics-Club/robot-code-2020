@@ -1,30 +1,46 @@
-#define PWMA 9 // right motor
-#define PWMB 10 // left motor
+/* Right motor */
+#define PWMA 9
+/* Left motor */
+#define PWMB 10
+
+/* Motor directions */
 #define INA1 8
 #define INA2 7
 #define INB1 11
 #define INB2 12
 
+/* Sensors */
 #define SBR 14
 #define SBL 15
-#define SFR 18
+#define SFR 16
 #define SFL 17
+#define SFF 18
+
+/* Encoders */
+#define ERA 20
+#define ERB 21
+#define ELA 5
+#define ELB 4
 
 /* PID loop constants */
-#define KP 0.001 //0.0015
-#define KI 0.0000
-#define KD 0
+#define KP 0.0015
+#define KI 0
+#define KD 0.000375
 
-/* EWMA */
-#define STARTINGAVERAGE 0
-#define BETA .875
+/* Physical realities */
+#define MAX_VOLTAGE 255
+#define MIN_VOLTAGE 28
+#define MAX_SPEED .8 // meters per second
+#define MAX_RPM 430
+#define WHEEL_BASE_LENGTH 0.101 // meters
+#define WHEEL_RADIUS 0.0215 // meters
 
-/* */
-#define MAX_SPEED 60
-#define WHEEL_BASE_LENGTH 0.085
-#define WHEEL_RADIUS 0.0236
-#define TOLERANCE 5
-#define MOTOR_CONSTANT 1
+/* Fake realities */
+#define TOLERANCE 20
+#define DESIRED_MAX_VOLTAGE 60
+#define TOO_LOW_VOLTAGE 10
+#define CAP_VOLTAGE(arg1) (arg1 >= DESIRED_MAX_VOLTAGE ? DESIRED_MAX_VOLTAGE : (arg1 < TOO_LOW_VOLTAGE ? 0 : max(arg1, MIN_VOLTAGE)))
+#define MAX_ANGULAR_VELOCITY 32
 
 class PIDLoop {
   public:
@@ -33,7 +49,7 @@ class PIDLoop {
       kI = kI1;
       kD = kD1;
     }
-    float updateError(float error, int dt) {
+    float updateError(float error, unsigned long dt) {
       float oldError = pError;
       pError = error;
       if (error == 0) {
@@ -41,7 +57,7 @@ class PIDLoop {
       } else {
         iError += (error * dt);
       }
-      dError = (error - oldError) / 2;
+      dError = (error - oldError) / dt;
       return kP * pError + kI * iError + kD * dError;
     }
     void wipe() {
@@ -54,25 +70,9 @@ class PIDLoop {
     float kP, kI, kD;
 };
 
-class EstimatedWeightedMovingAverage {
-  public:
-    EstimatedWeightedMovingAverage(float b, float startingAverage) {
-      beta = b;
-      average = startingAverage;
-    }
-    float addReading(float value) {
-      average = (beta * average) + ((1 - beta) * value);
-      return average;
-    }
-  private:
-    float beta, average;
-};
-
 char data[64];
-EstimatedWeightedMovingAverage* ewma = new EstimatedWeightedMovingAverage(BETA, STARTINGAVERAGE);
 PIDLoop* pid = new PIDLoop(KP, KI, KD);
 unsigned long currentTime;
-int quit = 1;
 
 void setup() {
   Serial.begin(9600);
@@ -80,46 +80,68 @@ void setup() {
   pinMode(INA2, OUTPUT);
   pinMode(INB1, OUTPUT);
   pinMode(INB2, OUTPUT);
+  pinMode(PWMA, OUTPUT);
+  pinMode(PWMB, OUTPUT);
+  pinMode(SFF, INPUT);
   pinMode(SFR, INPUT);
+  pinMode(SFL, INPUT);
+  pinMode(SBL, INPUT);
+  pinMode(SBR, INPUT);
+  pinMode(ERA, INPUT);
+  pinMode(ERB, INPUT);
+  pinMode(ELB, INPUT);
+  pinMode(ELA, INPUT);
   currentTime = millis();
   pid->wipe();
-  set_left_motor_direction(1);
-  set_right_motor_direction(1);
+  set_left_motor_direction(true);
+  set_right_motor_direction(true);
+  delay(4000);
 }
 
 void loop() {
-  if (quit > 0)  { set_motors(0, 0); delay(100000); return; }
+  int quit = 1;
+  if (quit > 1)  { set_motors(0, 0); delay(100000); return; }
   unsigned long newTime = millis();
-  int dt = newTime - currentTime;
+  unsigned long dt = (newTime - currentTime);
   currentTime = newTime;
-
-  int BR = analogRead(SBR);
-  int BL = analogRead(SBL);
-  int FR = analogRead(SFR);
-  int FL = analogRead(SFL);
-  float leftDiff = BL - FL;
-
-  float average = ewma->addReading(leftDiff);
+  float average = getDiff();
   float angular_velocity = pid->updateError(average, dt);
   float forward_velocity = MAX_SPEED / (abs(angular_velocity) + 1);
-  sprintf(data, "angular_vel: %f, average: %f, BL: %d, FL: %d\n", angular_velocity, average, BL, FL);
-  Serial.print(data);
   
+  float left, right;
   if (abs(average) < TOLERANCE) {
-    set_motors(0, 0);
+    left = 0;
+    right = 0;
   } else {
-    float left, right;
     unicycle_to_differential_drive(&left, &right, 0, angular_velocity, WHEEL_RADIUS, WHEEL_BASE_LENGTH);
     set_left_motor_direction(left >= 0);
     set_right_motor_direction(right >= 0);
-    set_motors(abs(left) * MOTOR_CONSTANT, abs(right) * MOTOR_CONSTANT);
-    sprintf(data, "\tleft: %f, right: %f\n", left, right);
-    Serial.print(data);
   }
-  delay(100);
+  set_motors(abs(left), abs(right));
+  String d = "\taverage: " + (String)(average) + ", angular_vel: " + (String)(angular_velocity) + ", left: " + (String)(left) + ", right: " + (String)(right) + ", dt: " + (String)(dt) + "\n";
+  Serial.print(d);
 }
 
-void set_left_motor_direction(int forward) {
+/* Use the sensors that are closer to a wall, more accurate readings */
+float getDiff() {
+  int sumBL = 0;
+  int sumFL = 0;
+  int sumBR = 0;
+  int sumFR = 0;
+  for (int i = 0; i < 25; i++) {
+    sumBL += analogRead(SBL);
+    sumFL += analogRead(SFL);
+    sumBR += analogRead(SBR);
+    sumFR += analogRead(SFR);
+    delay(1);
+  }
+  if (sumBR + sumFR > sumFL + sumBL) {
+    return (sumFR - sumBR) / 25.0;
+  }
+  return (sumBL - sumFL) / 25.0;
+}
+
+void set_left_motor_direction(bool forward) {
   if (forward) {
     digitalWrite(INB1, HIGH);
     digitalWrite(INB2, LOW);
@@ -129,7 +151,7 @@ void set_left_motor_direction(int forward) {
   }
 }
 
-void set_right_motor_direction(int forward) {
+void set_right_motor_direction(bool forward) {
   if (forward) {
     digitalWrite(INA1, HIGH);
     digitalWrite(INA2, LOW);
@@ -139,20 +161,12 @@ void set_right_motor_direction(int forward) {
   }
 }
 
+const float thirtyOverPi = 30 / PI;
+
 void set_motors(float left, float right) {
-  float l, r;
-  if (right == 0 && left == 0) {
-    l = 0;
-    r = 0;
-  } else if (left < right) {
-    l = left / right;
-    r = 1.0;
-  } else {
-    l = 1.0;
-    r = right / left;
-  }
-  analogWrite(PWMA, r * MAX_SPEED);
-  analogWrite(PWMB, l * MAX_SPEED);
-  sprintf(data, "\tWrote %f to left motor, %f to right\n", l * MAX_SPEED, r * MAX_SPEED);
-  Serial.print(data);
+  float l = CAP_VOLTAGE(map(left * thirtyOverPi, 0, MAX_ANGULAR_VELOCITY, 0, MAX_VOLTAGE));
+  float r = CAP_VOLTAGE(map(right * thirtyOverPi, 0, MAX_ANGULAR_VELOCITY, 0, MAX_VOLTAGE));
+  analogWrite(PWMB, l);
+  analogWrite(PWMA, r);
+  Serial.print("Wrote l: " + (String)l + ", r: " + (String)r + " \n");
 }
