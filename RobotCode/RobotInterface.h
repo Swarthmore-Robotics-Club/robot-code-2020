@@ -20,7 +20,7 @@ public:
   virtual float getTicksPerRevolution() = 0;
 
 // can implement in base class, but be sure to call super
-  virtual void doUpdate(float t, float dt);
+  virtual void doUpdate(double t, double dt);
 
 // derived quantities
   float getLeftEncoder();
@@ -35,7 +35,7 @@ public:
 
 private:
   // exponential moving average coefficient
-  const float velocityEmaCoefficient = 0.9;
+  const float velocityEmaCoefficient = 0.5;
 
   // encoder information for velocity
   float prevLeftEncoder = 0;

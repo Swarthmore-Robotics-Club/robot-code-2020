@@ -2,10 +2,11 @@
 #define MOTIONPROFILEFORWARDCONTROLLER_H_
 
 #include "VelocityController.h"
+#include "RobotInterface.h"
 
 class MotionProfileForwardController : public VelocityController {
 public:
-  MotionProfileForwardController();
+  MotionProfileForwardController(RobotInterface* iface);
 
   virtual ~MotionProfileForwardController();
 

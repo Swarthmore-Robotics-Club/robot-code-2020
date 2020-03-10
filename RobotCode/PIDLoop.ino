@@ -7,7 +7,7 @@ PIDLoop::PIDLoop(float kP1, float kI1, float kD1, float kF1) {
   kF = kF1;
 }
 
-float PIDLoop::updateError(float target, float actual, unsigned long dt) {
+float PIDLoop::updateError(float target, float actual, double dt) {
   float error = target - actual;
   float oldError = pError;
   pError = error;

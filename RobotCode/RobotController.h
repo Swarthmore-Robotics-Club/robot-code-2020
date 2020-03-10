@@ -5,9 +5,12 @@
 
 class RobotController {
 public:
-  virtual void doUpdate(float t, float dt);
+  virtual void doUpdate(double t, double dt) = 0;
 
 protected:
+  RobotController(RobotInterface* iface);
+  virtual ~RobotController();
+
   RobotInterface* interface;
 };
 

@@ -6,11 +6,11 @@
 
 class VelocityController : public RobotController {
 public:
-  VelocityController();
+  VelocityController(RobotInterface* iface);
 
   virtual ~VelocityController();
 
-  virtual void doUpdate(float t, float dt);
+  virtual void doUpdate(double t, double dt);
 
   void setVelocity(float left, float right);
 

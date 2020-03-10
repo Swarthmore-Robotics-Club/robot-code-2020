@@ -1,13 +1,14 @@
 #include "VelocityController.h"
 
-VelocityController::VelocityController() :
-  leftPidLoop(0.031, 0.005, 0., 0.0112),
-  rightPidLoop(0.03, 0.005, 0., 0.0112)
-  { }
+VelocityController::VelocityController(RobotInterface* iface) :
+  leftPidLoop(0.032, 0.005, 0., 0.0112),
+  rightPidLoop(0.031, 0.005, 0., 0.0112),
+  RobotController(iface) {
+}
 
 VelocityController::~VelocityController() {}
 
-void VelocityController::doUpdate(float t, float dt) {
+void VelocityController::doUpdate(double t, double dt) {
   float left = leftPidLoop.updateError(leftTargetVelocity, interface->getLeftVelocity(), dt);
   float right = rightPidLoop.updateError(rightTargetVelocity, interface->getRightVelocity(), dt);
 

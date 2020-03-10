@@ -4,14 +4,15 @@ RobotInterface::RobotInterface() {}
 
 RobotInterface::~RobotInterface() {}
 
-void RobotInterface::doUpdate(float t, float dt) {
+void RobotInterface::doUpdate(double t, double dt) {
   if (t - velocityRecomputeTimer > velocityRecomputeEvery) {
-    float leftDiff = (getLeftEncoder() - prevLeftEncoder) * getDistancePerTick() / dt;
-    float rightDiff = (getRightEncoder() - prevRightEncoder) * getDistancePerTick() / dt;
+    float leftDiff = (getLeftEncoder() - prevLeftEncoder) / (t - velocityRecomputeTimer);
+    float rightDiff = (getRightEncoder() - prevRightEncoder) / (t - velocityRecomputeTimer);
     prevLeftEncoder = getLeftEncoder();
     prevRightEncoder = getRightEncoder();
     leftVelocity = velocityEmaCoefficient * leftVelocity + (1. - velocityEmaCoefficient) * leftDiff;
     rightVelocity = velocityEmaCoefficient * rightVelocity + (1. - velocityEmaCoefficient) * rightDiff;
+    velocityRecomputeTimer = t;
   }
 }
 

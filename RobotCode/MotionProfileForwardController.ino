@@ -1,6 +1,6 @@
 #include "MotionProfileForwardController.h"
 
-MotionProfileForwardController::MotionProfileForwardController() {
+MotionProfileForwardController::MotionProfileForwardController(RobotInterface* iface) : VelocityController(iface) {
 
 }
 
