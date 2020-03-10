@@ -8,14 +8,14 @@ float prev_right_error;
 float integral_left_error;
 float integral_right_error;
 
-float controller_kp_left = 0.02;
-float controller_ki_left = 0.05;
+float controller_kp_left = 0.031;
+float controller_ki_left = 0.005;
 float controller_kd_left = 0.0000;
-float controller_kcalib_left = 0.015;
-float controller_kp_right = 0.02;
-float controller_ki_right = 0.05;
+float controller_kcalib_left = 0.0112;
+float controller_kp_right = 0.03;
+float controller_ki_right = 0.005;
 float controller_kd_right = 0.0000;
-float controller_kcalib_right = 0.015;
+float controller_kcalib_right = 0.0112;
 
 float motion_profile_v_max;
 float motion_profile_v_ramp_rate;

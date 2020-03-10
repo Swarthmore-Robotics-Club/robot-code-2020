@@ -30,7 +30,7 @@ robot_state_t get_robot_state() {
 void run_state_machine(float t) {
   switch (robot_state) {
     case RS_IDLE:
-      set_robot_state(RS_PRE_FORWARD);
+//      set_robot_state(RS_PRE_FORWARD);
       break;
     case RS_FORWARD:
       if (is_robot_done()) {
@@ -46,13 +46,13 @@ void run_state_machine(float t) {
       break;
     case RS_PRE_FORWARD:
       if (t - state_machine_timer > 0.5) {
-        configure_motion_profiling_forward(V_MAX, V_RAMP_RATE, 50);
+        configure_motion_profiling_forward(V_MAX, V_RAMP_RATE, 100);
         set_robot_state(RS_FORWARD);
       }
       break;
     case RS_PRE_ROTATE:
       if (t - state_machine_timer > 0.5) {
-        configure_motion_profiling_rotate(V_MAX, V_RAMP_RATE, PI / 2.);
+        configure_motion_profiling_rotate(V_MAX, V_RAMP_RATE, PI*1.02);
         set_robot_state(RS_ROTATE);
       }
       break;

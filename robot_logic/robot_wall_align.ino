@@ -3,8 +3,8 @@
 float prev_wall_align_error;
 float integral_wall_align_error;
 
-float wall_align_kp = 0.001;
-float wall_align_ki = 0.00002;
+float wall_align_kp = 0.0015;
+float wall_align_ki = 0.0009;
 float wall_align_kd = 0.00;
 
 void setup_robot_wall_align() {
@@ -16,10 +16,30 @@ void reset_robot_wall_align() {
   integral_wall_align_error = 0;
 }
 
+float get_left_align_error() {
+  float f = get_front_left_distance();
+  float r = get_rear_left_distance();
+  if (0 < f && f < 2500 && 0 < r && r < 2500) {
+    return (f - r) / 2.;
+  } else {
+    return 0;
+  }
+}
+
+float get_right_align_error() {
+  float f = get_front_right_distance();
+  float r = get_rear_right_distance();
+    if (0 < f && f < 2500 && 0 < r && r < 2500) {
+    return (r - f) / 2.;
+  } else {
+    return 0;
+  }
+}
+
 void run_robot_wall_align(float dt) {
   if (get_robot_state() == RS_WALL_ALIGN) {
     
-    float error = get_front_left_distance() - get_rear_left_distance();
+    float error = get_left_align_error() + get_right_align_error();
     float diff_error = (error - prev_wall_align_error) / dt;
     prev_wall_align_error = error;
   
@@ -30,7 +50,7 @@ void run_robot_wall_align(float dt) {
                  + wall_align_ki * integral_wall_align_error 
                  + wall_align_kd * diff_error;
 
-    if (fabs(error) < 100) {
+    if (fabs(error) < 50) {
       dtheta = 0;
     }
 

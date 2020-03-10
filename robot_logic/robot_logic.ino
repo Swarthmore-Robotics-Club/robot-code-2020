@@ -21,14 +21,18 @@ float sum_dt = 0;
 void debug(float dt, float t) {
   sum_dt += dt;
   if (sum_dt > 0.1) {
-    Serial2.print("velocity ");
-    Serial2.print(get_left_velocity());
-    Serial2.print(" ");
-    Serial2.print(get_right_velocity());
+//    Serial2.print("velocity ");
+//    Serial2.print(get_left_velocity());
+//    Serial2.print(" ");
+//    Serial2.print(get_right_velocity());
     Serial2.print(" positioning ");
     Serial2.print(get_front_left_distance());
     Serial2.print(" ");
     Serial2.print(get_rear_left_distance());
+    Serial2.print(" ");
+    Serial2.print(get_front_right_distance());
+    Serial2.print(" ");
+    Serial2.print(get_rear_right_distance());
     Serial2.println();
     sum_dt = 0;
   }
