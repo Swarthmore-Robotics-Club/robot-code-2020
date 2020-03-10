@@ -37,8 +37,13 @@ STM32Interface::~STM32Interface() { }
 void STM32Interface::setMotorOutput(float left, float right) {
   left = min(max(left, -1), 1);
   right = min(max(right, -1), 1);
-  int left_motor_output = (int) abs(round(left * 255));
-  int right_motor_output = (int) abs(round(right * 255));
+  float leftSign = (left > 0) - (left < 0);
+  float rightSign = (right > 0) - (right < 0);
+  if (left == 0) { leftSign = 0; }
+  if (right == 0) { rightSign = 0; }
+  
+  int left_motor_output = (int) abs(round(left * 100 + leftSign * 18));
+  int right_motor_output = (int) abs(round(right * 100 + rightSign * 18));
 
   if (left_motor_output > 0) {
     if (left >= 0) {
@@ -79,19 +84,19 @@ long STM32Interface::getRightEncoderRaw() {
 }
 
 float STM32Interface::getFrontLeftDistance() {
-  analogRead(PIN_DISTANCE_SENSOR_FRONT_LEFT);
+  return analogRead(PIN_DISTANCE_SENSOR_FRONT_LEFT);
 }
 
 float STM32Interface::getFrontRightDistance() {
-  analogRead(PIN_DISTANCE_SENSOR_FRONT_RIGHT);
+  return analogRead(PIN_DISTANCE_SENSOR_FRONT_RIGHT);
 }
 
 float STM32Interface::getRearLeftDistance() {
-  analogRead(PIN_DISTANCE_SENSOR_REAR_LEFT);
+  return analogRead(PIN_DISTANCE_SENSOR_REAR_LEFT);
 }
 
 float STM32Interface::getRearRightDistance() {
-  analogRead(PIN_DISTANCE_SENSOR_REAR_RIGHT);
+  return analogRead(PIN_DISTANCE_SENSOR_REAR_RIGHT);
 }
 
 float STM32Interface::getRobotRadius() {

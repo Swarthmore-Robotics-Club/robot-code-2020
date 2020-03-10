@@ -2,18 +2,21 @@
 #include "RobotController.h"
 #include "STM32Interface.h"
 #include "VelocityController.h"
+#include "WallAlignController.h"
 
 RobotInterface* robotInterface;
 RobotController* currentController;
 
 VelocityController* velocityController;
+WallAlignController* wallAlignController;
 
 unsigned long prev_time;
 
 void setup() {
   robotInterface = new STM32Interface();
   velocityController = new VelocityController(robotInterface);
-  currentController = velocityController;
+  wallAlignController = new WallAlignController(robotInterface);
+//  currentController = wallAlignController;
 
   prev_time = micros();
   Serial2.begin(9600);
@@ -28,18 +31,18 @@ void debug(double dt, double t) {
     Serial2.print(robotInterface->getLeftVelocity());
     Serial2.print(" ");
     Serial2.print(robotInterface->getRightVelocity());
-    Serial2.print(" encoders ");
-    Serial2.print(robotInterface->getLeftEncoderRaw());
+//    Serial2.print(" encoders ");
+//    Serial2.print(robotInterface->getLeftEncoderRaw());
+//    Serial2.print(" ");
+//    Serial2.print(robotInterface->getRightEncoderRaw());
+    Serial2.print(" positioning ");
+    Serial2.print(robotInterface->getFrontLeftDistance());
     Serial2.print(" ");
-    Serial2.print(robotInterface->getRightEncoderRaw());
-//    Serial2.print(" positioning ");
-//    Serial2.print(get_front_left_distance());
-//    Serial2.print(" ");
-//    Serial2.print(get_rear_left_distance());
-//    Serial2.print(" ");
-//    Serial2.print(get_front_right_distance());
-//    Serial2.print(" ");
-//    Serial2.print(get_rear_right_distance());
+    Serial2.print(robotInterface->getRearLeftDistance());
+    Serial2.print(" ");
+    Serial2.print(robotInterface->getFrontRightDistance());
+    Serial2.print(" ");
+    Serial2.print(robotInterface->getRearRightDistance());
     Serial2.println();
     sum_dt = 0;
   }
@@ -55,7 +58,6 @@ void loop() {
     currentController->doUpdate(t, dt);
   }
 
-  velocityController->setVelocity(-10, 10);
   debug(dt, t);
 
   delay(1);
