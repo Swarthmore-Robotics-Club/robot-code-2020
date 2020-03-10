@@ -1,9 +1,10 @@
 #include "VelocityController.h"
 
-VelocityController::VelocityController(RobotInterface* iface) :
-  leftPidLoop(0.032, 0.005, 0., 0.0112),
-  rightPidLoop(0.031, 0.005, 0., 0.0112),
-  RobotController(iface) {
+VelocityController::VelocityController(RobotInterface* iface) : RobotController(iface) {
+  PIDConstants left = iface->getLeftWheelPIDConstants();
+  PIDConstants right = iface->getRightWheelPIDConstants();
+  leftPidLoop = new PIDLoop(left.kP, left.kI, left.kD, left.kF);
+  rightPidLoop = new PIDLoop(right.kP, right.kI, right.kD, right.kF);
 }
 
 VelocityController::~VelocityController() {}

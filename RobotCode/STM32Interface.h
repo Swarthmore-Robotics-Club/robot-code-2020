@@ -28,6 +28,10 @@ public:
   virtual float getWheelRadius();
 
   virtual float getTicksPerRevolution();
+  
+  virtual PIDConstants getLefttWheelPIDConstants();
+  
+  virtual PIDConstants getRightWheelPIDConstants();
 
   static void encoderLeftChangeA();
 
@@ -62,6 +66,9 @@ private:
   static long rightEncoder;
 
   bool initialized = false;
+
+  PIDConstants leftWheelPID = (PIDConstants){0.032, 0.005, 0, 0.0112};
+  PIDConstants rightWheelPID = (PIDConstants){0.031, 0.005, 0, 0.0112}; 
 };
 
 #endif
