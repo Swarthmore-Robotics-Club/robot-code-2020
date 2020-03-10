@@ -1,5 +1,9 @@
 #include "RobotInterface.h"
 
+RobotInterface::RobotInterface() {}
+
+RobotInterface::~RobotInterface() {}
+
 void RobotInterface::doUpdate(float t, float dt) {
   if (t - velocityRecomputeTimer > velocityRecomputeEvery) {
     float leftDiff = (getLeftEncoder() - prevLeftEncoder) * getDistancePerTick() / dt;

@@ -1,5 +1,8 @@
 #include "STM32Interface.h"
 
+long STM32Interface::leftEncoder;
+long STM32Interface::rightEncoder;
+
 STM32Interface::STM32Interface() {
   if (!initialized) {
     pinMode(PIN_MOTOR_LEFT_A, OUTPUT);

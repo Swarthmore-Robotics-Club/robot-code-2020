@@ -3,21 +3,21 @@
 
 class RobotInterface {
 protected:
-  RobotInterface() { }
-  virtual ~RobotInterface() { }
+  RobotInterface();
+  virtual ~RobotInterface();
 
 public:
 // need to implement in base class
-  virtual void setMotorOutput(float left, float right);
-  virtual long getLeftEncoderRaw();
-  virtual long getRightEncoderRaw();
-  virtual float getFrontLeftDistance();
-  virtual float getFrontRightDistance();
-  virtual float getRearLeftDistance();
-  virtual float getRearRightDistance();
-  virtual float getRobotRadius() ;
-  virtual float getWheelRadius();
-  virtual float getTicksPerRevolution();
+  virtual void setMotorOutput(float left, float right) = 0;
+  virtual long getLeftEncoderRaw() = 0;
+  virtual long getRightEncoderRaw() = 0;
+  virtual float getFrontLeftDistance() = 0;
+  virtual float getFrontRightDistance() = 0;
+  virtual float getRearLeftDistance() = 0;
+  virtual float getRearRightDistance() = 0;
+  virtual float getRobotRadius() = 0;
+  virtual float getWheelRadius() = 0;
+  virtual float getTicksPerRevolution() = 0;
 
 // can implement in base class, but be sure to call super
   virtual void doUpdate(float t, float dt);
