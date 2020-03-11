@@ -111,6 +111,14 @@ float STM32Interface::getTicksPerRevolution() {
   return 900;
 }
 
+PIDConstants STM32Interface::getLefttWheelPIDConstants() {
+  return leftWheelPID;
+}
+  
+PIDConstants STM32Interface::getRightWheelPIDConstants() {
+  return rightWheelPID;
+}
+
 void STM32Interface::encoderLeftChangeA() {
   leftEncoder -= (1 - 2*digitalRead(PIN_ENCODER_LEFT_A)) * (1 - 2*digitalRead(PIN_ENCODER_LEFT_B));
 }

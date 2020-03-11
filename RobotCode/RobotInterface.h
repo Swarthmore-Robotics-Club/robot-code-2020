@@ -1,6 +1,10 @@
 #ifndef ROBOTINTERFACE_H_
 #define ROBOTINTERFACE_H_
 
+typedef struct {
+  float kP, kI, kD, kF;  
+} PIDConstants;
+
 class RobotInterface {
 protected:
   RobotInterface();
@@ -11,13 +15,16 @@ public:
   virtual void setMotorOutput(float left, float right) = 0;
   virtual long getLeftEncoderRaw() = 0;
   virtual long getRightEncoderRaw() = 0;
-  virtual float getFrontLeftDistance() = 0;
-  virtual float getFrontRightDistance() = 0;
-  virtual float getRearLeftDistance() = 0;
-  virtual float getRearRightDistance() = 0;
+  virtual int getFrontFrontDistance() = 0;
+  virtual int getFrontLeftDistance() = 0;
+  virtual int getFrontRightDistance() = 0;
+  virtual int getRearLeftDistance() = 0;
+  virtual int getRearRightDistance() = 0;
   virtual float getRobotRadius() = 0;
   virtual float getWheelRadius() = 0;
   virtual float getTicksPerRevolution() = 0;
+  virtual PIDConstants getLeftWheelPIDConstants() = 0;
+  virtual PIDConstants getRightWheelPIDConstants() = 0;
 
 // can implement in base class, but be sure to call super
   virtual void doUpdate(double t, double dt);

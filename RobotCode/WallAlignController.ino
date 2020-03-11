@@ -1,7 +1,7 @@
 #include "WallAlignController.h"
 
 WallAlignController::WallAlignController(RobotInterface* iface) 
-  : orientationPid(0.0015*0, 0, 0.00001, 0),
+  : orientationPid(0.00015, 0, 0, 0),
     VelocityController(iface) {
 }
 
@@ -29,14 +29,11 @@ float WallAlignController::getDistanceDiff() {
 }
 
 void WallAlignController::doUpdate(double t, double dt) {
-  float diff = getDistanceDiff();
+  float diff = 0-getDistanceDiff();
   float angularVelocity = orientationPid.updateError(0, diff, dt);
   if (fabs(diff) < ALIGNMENT_TOLERANCE) {
     angularVelocity = 0;
   }
-
   setPolarVelocity(0, angularVelocity);
   VelocityController::doUpdate(t, dt);
-
-  Serial2.println(orientationPid.iError);
 }

@@ -1,6 +1,6 @@
 #include "RobotInterface.h"
 #include "RobotController.h"
-#include "STM32Interface.h"
+#include "TeensyInterface.h"
 #include "VelocityController.h"
 #include "WallAlignController.h"
 
@@ -13,39 +13,12 @@ WallAlignController* wallAlignController;
 unsigned long prev_time;
 
 void setup() {
-  robotInterface = new STM32Interface();
+  robotInterface = new TeensyInterface();
   velocityController = new VelocityController(robotInterface);
   wallAlignController = new WallAlignController(robotInterface);
   currentController = velocityController;
 
   prev_time = micros();
-  Serial2.begin(9600);
-}
-
-
-float sum_dt = 0;
-void debug(double dt, double t) {
-  sum_dt += dt;
-  if (sum_dt > 0.1) {
-    Serial2.print("velocity ");
-    Serial2.print(robotInterface->getLeftVelocity());
-    Serial2.print(" ");
-    Serial2.print(robotInterface->getRightVelocity());
-//    Serial2.print(" encoders ");
-//    Serial2.print(robotInterface->getLeftEncoderRaw());
-//    Serial2.print(" ");
-//    Serial2.print(robotInterface->getRightEncoderRaw());
-    Serial2.print(" positioning ");
-    Serial2.print(robotInterface->getFrontLeftDistance());
-    Serial2.print(" ");
-    Serial2.print(robotInterface->getRearLeftDistance());
-    Serial2.print(" ");
-    Serial2.print(robotInterface->getFrontRightDistance());
-    Serial2.print(" ");
-    Serial2.print(robotInterface->getRearRightDistance());
-    Serial2.println();
-    sum_dt = 0;
-  }
 }
 
 void loop() {
@@ -57,10 +30,6 @@ void loop() {
   if (currentController) {
     currentController->doUpdate(t, dt);
   }
-
-  velocityController->setVelocity(5, 5);
-
-  debug(dt, t);
 
   delay(1);
 }
