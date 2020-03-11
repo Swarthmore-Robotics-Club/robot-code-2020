@@ -17,7 +17,7 @@ protected:
 private:
   PIDLoop orientationPid;
 
-  const float ALIGNMENT_TOLERANCE = 15.0;
+  const float ALIGNMENT_TOLERANCE = 50.0;
 };
 
 #endif

@@ -16,7 +16,7 @@ void setup() {
   robotInterface = new STM32Interface();
   velocityController = new VelocityController(robotInterface);
   wallAlignController = new WallAlignController(robotInterface);
-//  currentController = wallAlignController;
+  currentController = velocityController;
 
   prev_time = micros();
   Serial2.begin(9600);
@@ -57,6 +57,8 @@ void loop() {
   if (currentController) {
     currentController->doUpdate(t, dt);
   }
+
+  velocityController->setVelocity(5, 5);
 
   debug(dt, t);
 

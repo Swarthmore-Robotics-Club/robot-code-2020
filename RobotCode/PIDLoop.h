@@ -7,7 +7,7 @@ class PIDLoop {
     float updateError(float target, float actual, double dt);
     void wipe();
 
-  private:
+//  private:
     float pError, iError, dError;
     float kP, kI, kD, kF;
 };

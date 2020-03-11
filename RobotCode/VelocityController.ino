@@ -1,8 +1,8 @@
 #include "VelocityController.h"
 
 VelocityController::VelocityController(RobotInterface* iface) :
-  leftPidLoop(0.032, 0.005, 0., 0.0112),
-  rightPidLoop(0.031, 0.005, 0., 0.0112),
+  leftPidLoop(0.08, 0.0001, 0., 0.0122),
+  rightPidLoop(0.05, 0.0001, 0., 0.0112),
   RobotController(iface) {
 }
 
